@@ -1,0 +1,9 @@
+[submodule "libs/gsl"]
+	path = libs/gsl
+	url = https://github.com/microsoft/GSL.git
+[submodule "libs/argparse"]
+	path = libs/argparse
+	url = https://github.com/p-ranav/argparse
+[submodule "libs/magic_enum"]
+	path = libs/magic_enum
+	url = https://github.com/Neargye/magic_enum.git
