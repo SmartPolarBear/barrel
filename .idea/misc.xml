@@ -9,6 +9,7 @@
       <file path="$PROJECT_DIR$/libs/argparse" />
       <file path="$PROJECT_DIR$/libs/gsl" />
       <file path="$PROJECT_DIR$/libs/magic_enum" />
+      <file path="$PROJECT_DIR$/test/gtest" />
     </excludeRoots>
   </component>
 </project>
