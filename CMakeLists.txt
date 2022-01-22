@@ -14,7 +14,10 @@ target_link_libraries(barrel
         PRIVATE cppcoro
         PRIVATE GSL
         PRIVATE argparse
-        PRIVATE magic_enum)
+        PRIVATE magic_enum
+        PRIVATE plog)
+
+add_subdirectory(storage)
 
 add_subdirectory(test)
 
