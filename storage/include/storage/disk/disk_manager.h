@@ -22,16 +22,17 @@ class disk_manager final
 public:
 	[[nodiscard]] explicit disk_manager(std::string name);
 
+	/// shutdown the disk manager
 	void shutdown();
 
-	/// write a page to db file
+	/// write pages to db file
 	/// \param pid
 	/// \param data
 	void write_page(page_id_type pid, std::span<uint8_t> data);
 
-	/// write a page to db file
+	/// read pages to db file
 	/// \param pid
-	/// \param data
+	/// \param data the data buffer to read to
 	void read_page(page_id_type pid, std::span<uint8_t> data);
 
 	/// write data to log
@@ -42,6 +43,12 @@ public:
 	/// \param data
 	/// \param offset
 	void read_log(std::span<uint8_t> data, offset_type offset);
+
+	[[nodiscard]] size_t get_write_count()const;
+
+	[[nodiscard]] size_t get_flush_count()const;
+
+	[[nodiscard]] bool get_flush_state()const;
 
 private:
 	static inline void open_or_create_stream(std::fstream& stream, const std::string& name);
@@ -60,6 +67,8 @@ private:
 	std::fstream db_stream_{}, log_stream_{};
 
 	std::string db_name_, log_name_;
+
+	bool flush_log_{false};
 
 	std::mutex mut_;
 };
