@@ -13,11 +13,7 @@ target_include_directories(barrel_test
         PRIVATE ${gtest_SOURCE_DIR}/include)
 
 target_link_libraries(barrel_test
-        PRIVATE cppcoro
         PUBLIC gtest
-        PUBLIC gtest_main
-        PUBLIC GSL
-        PUBLIC argparse
-        PUBLIC magic_enum)
+        PUBLIC gtest_main)
 
 gtest_discover_tests(barrel_test)

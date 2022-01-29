@@ -28,30 +28,31 @@ public:
 	/// write pages to db file
 	/// \param pid
 	/// \param data
-	void write_page(page_id_type pid, std::span<uint8_t> data);
+	void write_page(page_id_type pid, byte_span data);
 
 	/// read pages to db file
 	/// \param pid
 	/// \param data the data buffer to read to
-	void read_page(page_id_type pid, std::span<uint8_t> data);
+	void read_page(page_id_type pid, byte_span data);
 
 	/// write data to log
 	/// \param data
-	void write_log(std::span<uint8_t> data);
+	void write_log(byte_span data);
 
 	/// read to data from offset
 	/// \param data
 	/// \param offset
-	void read_log(std::span<uint8_t> data, offset_type offset);
+	void read_log(byte_span data, offset_type offset);
 
-	[[nodiscard]] size_t get_write_count()const;
+	[[nodiscard]] size_t get_write_count() const;
 
-	[[nodiscard]] size_t get_flush_count()const;
+	[[nodiscard]] size_t get_flush_count() const;
 
-	[[nodiscard]] bool get_flush_state()const;
+	[[nodiscard]] bool get_flush_state() const;
 
 private:
-	static inline void open_or_create_stream(std::fstream& stream, const std::string& name);
+	static inline void
+	open_or_create_stream(std::fstream& stream, std::ios_base::openmode mode, const std::string& name);
 
 	static inline constexpr offset_type PAGE_ID_TO_OFFSET(page_id_type id)
 	{
@@ -68,7 +69,7 @@ private:
 
 	std::string db_name_, log_name_;
 
-	bool flush_log_{false};
+	bool flush_log_{ false };
 
 	std::mutex mut_;
 };

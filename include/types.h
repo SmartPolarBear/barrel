@@ -7,9 +7,16 @@
 #pragma once
 
 #include <cstdint>
+#include <span>
+
+#include <gsl/gsl>
 
 namespace barrel
 {
+
+using gsl::index;
+
+using byte_span = std::span<char>;
 
 using offset_type = int64_t;
 

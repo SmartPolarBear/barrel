@@ -22,25 +22,26 @@ barrel::storage::disk::disk_manager::disk_manager(std::string name)
 {
 	lock_guard g{ mut_ };
 
-	open_or_create_stream(log_stream_, log_name_);
-	open_or_create_stream(db_stream_, db_name_);
+	open_or_create_stream(log_stream_, std::ios::binary | std::ios::in | std::ios::app | std::ios::out, log_name_);
+	open_or_create_stream(db_stream_, std::ios::binary | std::ios::in | std::ios::out, db_name_);
 
 	last_buf = nullptr;
 }
 
-void barrel::storage::disk::disk_manager::open_or_create_stream(fstream& stream, const std::string& name)
+void barrel::storage::disk::disk_manager::open_or_create_stream(fstream& stream, ios_base::openmode mode,
+		const std::string& name)
 {
-	stream.open(name, ios::binary | ios::in | ios::app | ios::out);
+	stream.open(name, mode);
 
 	// create if not exist
 	if (!stream.is_open())
 	{
 		stream.clear();
 
-		stream.open(name, ios::binary | ios::trunc | ios::app | ios::out);
+		stream.open(name, ios::binary | ios::trunc | ios::out);
 		stream.close();
 
-		stream.open(name, ios::binary | ios::in | ios::app | ios::out);
+		stream.open(name, mode);
 
 		if (!stream.is_open())
 		{
@@ -57,7 +58,7 @@ void barrel::storage::disk::disk_manager::shutdown()
 	db_stream_.close();
 }
 
-void barrel::storage::disk::disk_manager::write_page(barrel::page_id_type pid, std::span<uint8_t> data)
+void barrel::storage::disk::disk_manager::write_page(barrel::page_id_type pid, byte_span data)
 {
 	Expects(data.size() >= PAGE_SIZE);
 
@@ -68,9 +69,9 @@ void barrel::storage::disk::disk_manager::write_page(barrel::page_id_type pid, s
 	statistics_.writes_++;
 
 	db_stream_.seekp(offset);
-	db_stream_.write(reinterpret_cast<char*>(data.data()), PAGE_SIZE);
+	db_stream_.write(data.data(), PAGE_SIZE);
 
-	if (!db_stream_)
+	if (db_stream_.bad())// unrecoverable error
 	{
 		LOG_DEBUG << "I/O error when writing page";
 		return;
@@ -79,7 +80,7 @@ void barrel::storage::disk::disk_manager::write_page(barrel::page_id_type pid, s
 	db_stream_.flush();
 }
 
-void barrel::storage::disk::disk_manager::read_page(barrel::page_id_type pid, std::span<uint8_t> data)
+void barrel::storage::disk::disk_manager::read_page(barrel::page_id_type pid, byte_span data)
 {
 	Expects(data.size() >= PAGE_SIZE);
 
@@ -93,8 +94,8 @@ void barrel::storage::disk::disk_manager::read_page(barrel::page_id_type pid, st
 	lock_guard g{ mut_ };
 
 	db_stream_.seekg(offset);
-	db_stream_.read(reinterpret_cast<char*>(data.data()), PAGE_SIZE);
-	if (!db_stream_)
+	db_stream_.read(data.data(), PAGE_SIZE);
+	if (db_stream_.bad()) // unrecoverable error
 	{
 		LOG_DEBUG << "I/O error when reading page";
 		return;
@@ -112,7 +113,7 @@ void barrel::storage::disk::disk_manager::read_page(barrel::page_id_type pid, st
 	}
 }
 
-void barrel::storage::disk::disk_manager::write_log(std::span<uint8_t> data)
+void barrel::storage::disk::disk_manager::write_log(byte_span data)
 {
 	Expects(last_buf != reinterpret_cast<char*>(data.data()));
 
@@ -123,9 +124,9 @@ void barrel::storage::disk::disk_manager::write_log(std::span<uint8_t> data)
 	flush_log_ = true;
 
 	statistics_.writes_++;
-	log_stream_.write(reinterpret_cast<char*>(data.data()), data.size());
+	log_stream_.write(data.data(), data.size());
 
-	if (!log_stream_)
+	if (log_stream_.bad())// unrecoverable error
 	{
 		LOG_DEBUG << "I/O error when writing log";
 		return;
@@ -135,7 +136,7 @@ void barrel::storage::disk::disk_manager::write_log(std::span<uint8_t> data)
 	flush_log_ = false;
 }
 
-void barrel::storage::disk::disk_manager::read_log(std::span<uint8_t> data, barrel::offset_type offset)
+void barrel::storage::disk::disk_manager::read_log(byte_span data, barrel::offset_type offset)
 {
 	if (data.empty())return;
 	if (offset > filesystem::file_size(log_name_))
@@ -145,9 +146,9 @@ void barrel::storage::disk::disk_manager::read_log(std::span<uint8_t> data, barr
 	}
 
 	log_stream_.seekg(offset);
-	log_stream_.read(reinterpret_cast<char*>(data.data()), data.size());
+	log_stream_.read(data.data(), data.size());
 
-	if (!log_stream_)
+	if (log_stream_.bad())// unrecoverable error
 	{
 		LOG_DEBUG << "I/O error when reading log";
 		return;
