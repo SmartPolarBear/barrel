@@ -5,10 +5,12 @@
 #include "storage/disk/disk_manager.h"
 #include "exception/exception.h"
 
-#include <mutex>
+#include <plog/Log.h>
+
 #include <filesystem>
 
-#include <plog/Log.h>
+#include <gsl/assert>
+
 
 using namespace std;
 
@@ -57,7 +59,7 @@ void barrel::storage::disk::disk_manager::shutdown()
 
 void barrel::storage::disk::disk_manager::write_page(barrel::page_id_type pid, std::span<uint8_t> data)
 {
-	assert(data.size() > PAGE_SIZE);
+	Expects(data.size() >= PAGE_SIZE);
 
 	const auto offset = PAGE_ID_TO_OFFSET(pid);
 
@@ -79,7 +81,7 @@ void barrel::storage::disk::disk_manager::write_page(barrel::page_id_type pid, s
 
 void barrel::storage::disk::disk_manager::read_page(barrel::page_id_type pid, std::span<uint8_t> data)
 {
-	assert(data.size() > PAGE_SIZE);
+	Expects(data.size() >= PAGE_SIZE);
 
 	const auto offset = PAGE_ID_TO_OFFSET(pid);
 	if (offset > filesystem::file_size(db_name_))
@@ -112,7 +114,8 @@ void barrel::storage::disk::disk_manager::read_page(barrel::page_id_type pid, st
 
 void barrel::storage::disk::disk_manager::write_log(std::span<uint8_t> data)
 {
-	assert(last_buf == reinterpret_cast<char*>(data.data()));
+	Expects(last_buf != reinterpret_cast<char*>(data.data()));
+
 	last_buf = reinterpret_cast<char*>(data.data());
 
 	if (data.empty())return;

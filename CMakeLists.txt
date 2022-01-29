@@ -8,7 +8,12 @@ find_package(cppcoro CONFIG REQUIRED)
 
 add_executable(barrel main.cpp)
 
+add_subdirectory(test)
+
 target_include_directories(barrel
+        PRIVATE include)
+
+target_include_directories(barrel_test
         PRIVATE include)
 
 #3rd party libraries
@@ -20,8 +25,8 @@ target_link_libraries(barrel
         PRIVATE magic_enum
         PRIVATE plog)
 
+add_subdirectory(buffer)
 add_subdirectory(storage)
 
-add_subdirectory(test)
 
 
