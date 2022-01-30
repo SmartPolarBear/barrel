@@ -22,13 +22,23 @@ barrel::storage::disk::disk_manager::disk_manager(std::string name)
 {
 	lock_guard g{ mut_ };
 
-	open_or_create_stream(log_stream_, std::ios::binary | std::ios::in | std::ios::app | std::ios::out, log_name_);
-	open_or_create_stream(db_stream_, std::ios::binary | std::ios::in | std::ios::out, db_name_);
+	open_or_create_stream(log_stream_,
+			std::ios::binary | std::ios::in | std::ios::app | std::ios::out,
+			std::ios::binary | std::ios::trunc | std::ios::app | std::ios::out,
+			log_name_);
+
+	open_or_create_stream(db_stream_,
+			std::ios::binary | std::ios::in | std::ios::out,
+			std::ios::binary | std::ios::trunc | std::ios::out,
+			db_name_);
 
 	last_buf = nullptr;
+
 }
 
-void barrel::storage::disk::disk_manager::open_or_create_stream(fstream& stream, ios_base::openmode mode,
+void barrel::storage::disk::disk_manager::open_or_create_stream(fstream& stream,
+		ios_base::openmode mode,
+		std::ios_base::openmode create_mode,
 		const std::string& name)
 {
 	stream.open(name, mode);
@@ -38,16 +48,19 @@ void barrel::storage::disk::disk_manager::open_or_create_stream(fstream& stream,
 	{
 		stream.clear();
 
-		stream.open(name, ios::binary | ios::trunc | ios::out);
+		stream.open(name, create_mode);
 		stream.close();
 
 		stream.open(name, mode);
 
 		if (!stream.is_open())
 		{
-			throw barrel::exceptions::exception{ std::format("Cannot open file {} ", name) };
+			const auto e = strerror(errno);
+			throw barrel::exceptions::exception{ std::format("Cannot open file {}, error {}", name, e) };
 		}
 	}
+
+	stream.clear();
 }
 
 void barrel::storage::disk::disk_manager::shutdown()
@@ -73,7 +86,8 @@ void barrel::storage::disk::disk_manager::write_page(barrel::page_id_type pid, b
 
 	if (db_stream_.bad())// unrecoverable error
 	{
-		LOG_DEBUG << "I/O error when writing page";
+		const auto e = strerror(errno);
+		LOG_DEBUG << std::format("I/O error {} when writing page", e);
 		return;
 	}
 
@@ -97,7 +111,8 @@ void barrel::storage::disk::disk_manager::read_page(barrel::page_id_type pid, by
 	db_stream_.read(data.data(), PAGE_SIZE);
 	if (db_stream_.bad()) // unrecoverable error
 	{
-		LOG_DEBUG << "I/O error when reading page";
+		const auto e = strerror(errno);
+		LOG_DEBUG << std::format("I/O error {} when reading page", e);
 		return;
 	}
 
@@ -115,20 +130,25 @@ void barrel::storage::disk::disk_manager::read_page(barrel::page_id_type pid, by
 
 void barrel::storage::disk::disk_manager::write_log(byte_span data)
 {
-	Expects(last_buf != reinterpret_cast<char*>(data.data()));
+	Expects(last_buf != data.data());
 
-	last_buf = reinterpret_cast<char*>(data.data());
+	last_buf = data.data();
 
-	if (data.empty())return;
+	if (data.empty())
+	{
+		return;
+	}
 
 	flush_log_ = true;
 
-	statistics_.writes_++;
+	statistics_.flushes_++;
+
 	log_stream_.write(data.data(), data.size());
 
 	if (log_stream_.bad())// unrecoverable error
 	{
-		LOG_DEBUG << "I/O error when writing log";
+		const auto e = strerror(errno);
+		LOG_DEBUG << std::format("I/O error {} when writing log", e);
 		return;
 	}
 
@@ -150,7 +170,8 @@ void barrel::storage::disk::disk_manager::read_log(byte_span data, barrel::offse
 
 	if (log_stream_.bad())// unrecoverable error
 	{
-		LOG_DEBUG << "I/O error when reading log";
+		const auto e = strerror(errno);
+		LOG_DEBUG << std::format("I/O error {} when reading log", e);
 		return;
 	}
 
@@ -158,7 +179,7 @@ void barrel::storage::disk::disk_manager::read_log(byte_span data, barrel::offse
 	if (read_count < data.size())
 	{
 		LOG_DEBUG << "No enough data to read log";
-		db_stream_.clear();
+		log_stream_.clear();
 		for (auto iter = data.begin() + read_count; iter != data.end(); iter++)
 		{
 			*iter = 0;

@@ -52,7 +52,10 @@ public:
 
 private:
 	static inline void
-	open_or_create_stream(std::fstream& stream, std::ios_base::openmode mode, const std::string& name);
+	open_or_create_stream(std::fstream& stream,
+			std::ios_base::openmode mode,
+			std::ios_base::openmode create_mode,
+			const std::string& name);
 
 	static inline constexpr offset_type PAGE_ID_TO_OFFSET(page_id_type id)
 	{
