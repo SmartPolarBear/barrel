@@ -11,7 +11,7 @@ using namespace std;
 buffer::clock_replacer::clock_replacer(size_t capacity)
 		: frames_(capacity + 1/*slot 0 is unused*/), capacity_(capacity)
 {
-	Ensures(frames_.size() == capacity_);
+	Ensures(frames_.size() == capacity_ + 1);
 }
 
 std::optional<frame_id_type> barrel::buffer::clock_replacer::victim()
@@ -25,7 +25,7 @@ std::optional<frame_id_type> barrel::buffer::clock_replacer::victim()
 	while (size_ > 0)
 	{
 		auto& frame = frames_.at(hand_);
-		const auto id = hand_ + 1;
+		const auto id = hand_;
 
 		hand_++;
 		hand_ %= capacity_;

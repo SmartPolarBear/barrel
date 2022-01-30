@@ -6,6 +6,7 @@ add_subdirectory(gtest)
 
 add_executable(barrel_test
         disk_manager_test.cpp
+        clock_replacer_test.cpp
         )
 
 target_include_directories(barrel_test

@@ -24,6 +24,15 @@ public:
 
 	void unpin(frame_id_type id) override;
 
+	/// Intended for tests: return the reference bit of id
+	/// \param id
+	/// \return
+	[[nodiscard]] inline int reference(frame_id_type id) const
+	{
+		Expects(id <= capacity_);
+		return frames_[id].ref;
+	}
+
 	[[nodiscard]] size_t size() const override;
 
 private:
