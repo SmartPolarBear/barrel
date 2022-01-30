@@ -23,4 +23,6 @@ using offset_type = int64_t;
 // the id of page
 using page_id_type = int64_t;
 static inline constexpr page_id_type INVALID_PAGE_ID = -1;
+
+using frame_id_type = int64_t;
 }
