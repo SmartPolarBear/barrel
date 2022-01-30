@@ -7,3 +7,4 @@ target_include_directories(barrel
 
 target_include_directories(barrel_test
         PRIVATE include)
+

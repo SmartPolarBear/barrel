@@ -17,6 +17,7 @@
 namespace barrel::storage::disk
 {
 
+/// \brief disk manager manages all writes and reads
 class disk_manager final
 {
 public:

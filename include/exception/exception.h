@@ -52,7 +52,7 @@ private:
 	exception_type type_{ exception_type::INVALID };
 };
 
-class not_implemented final : public exception
+class [[maybe_unused]] not_implemented final : public exception
 {
 public:
 	not_implemented() = delete;
