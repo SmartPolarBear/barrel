@@ -2,7 +2,7 @@
 // Created by cleve on 1/22/2022.
 //
 
-// disk manager manages the database file
+// disk manager which manages the database file
 
 #pragma once
 

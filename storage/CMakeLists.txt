@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 
+add_subdirectory(page)
 add_subdirectory(disk)
 
 target_include_directories(barrel

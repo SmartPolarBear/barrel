@@ -18,11 +18,14 @@ using gsl::index;
 
 using byte_span = std::span<char>;
 
-using offset_type = int64_t;
+using offset_type = gsl::index;
 
 // the id of page
-using page_id_type = int64_t;
+using page_id_type = int32_t;
 static inline constexpr page_id_type INVALID_PAGE_ID = -1;
 
-using frame_id_type = int64_t;
+using frame_id_type = int32_t;
+
+// log sequence number
+using lsn_type = int32_t;
 }

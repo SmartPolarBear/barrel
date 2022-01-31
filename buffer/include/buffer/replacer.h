@@ -2,6 +2,8 @@
 // Created by cleve on 1/30/2022.
 //
 
+// interface for a replacer
+
 #pragma once
 
 #include "types.h"
@@ -10,6 +12,7 @@
 
 namespace barrel::buffer
 {
+/// interface for a replacer
 class I_replacer
 {
 public:

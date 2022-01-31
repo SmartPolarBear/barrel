@@ -1,6 +1,6 @@
 # Barrel  
 
-A database implementation in modern C++, which models sqlite and the [bustub](https://github.com/cmu-db/bustub) project from CMU.  
+A database implementation in modern C++, which models [sqlite](https://github.com/sqlite/sqlite) and the [bustub](https://github.com/cmu-db/bustub) project from CMU.  
 
 
 [![issues](https://img.shields.io/github/issues/SmartPolarBear/barrel)](https://github.com/SmartPolarBear/barrel/issues)
@@ -35,7 +35,7 @@ barrel --help
 
 ## Contributing
 
-Contributions are what make the open source community such an amazing place to be learned, inspire, and create_on_heap. Any contributions you make are **greatly appreciated**.
+Contributions are what make the open source community such an amazing place to be learned, inspire, and create. Any contributions you make are **greatly appreciated**.
 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)

@@ -2,6 +2,8 @@
 // Created by cleve on 1/27/2022.
 //
 
+// custom exceptions for barrel project
+
 #pragma once
 
 #include <iostream>
