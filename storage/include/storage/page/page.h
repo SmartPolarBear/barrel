@@ -9,11 +9,17 @@
 
 #include <shared_mutex>
 
+namespace barrel::buffer{
+class buffer_pool_manager;
+}
+
 namespace barrel::storage::page
 {
 class page
 {
 public:
+	friend class barrel::buffer::buffer_pool_manager;
+
 	page();
 
 	~page() = default;
