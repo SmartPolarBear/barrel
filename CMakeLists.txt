@@ -32,8 +32,7 @@ target_link_libraries(barrel_test
         PRIVATE magic_enum
         PRIVATE plog)
 
-add_subdirectory(buffer)
-add_subdirectory(storage)
-
+add_subdirectory(frontend)
+add_subdirectory(backend)
 
 
